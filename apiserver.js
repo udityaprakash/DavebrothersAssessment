@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const app = express();
 
 //local database
-const dburllocalhost = "mongodb://localhost:27017";
+const dburllocalhost = "mongodb://localhost:27017/Davebrother";
 
 //online database
 const dburl = "mongodb+srv://udityaprakash01:sAMc1FmiB4wWnxAx@cluster0.za5wk8j.mongodb.net/?retryWrites=true&w=majority";
@@ -29,12 +29,104 @@ function connecttodatabase(){
 
 connecttodatabase();
 
-app.get("/",(req,res)=>{
-    res.status(200).json({
-        msg:"success"
-    })
+//designing schema of database
+const DashboardSchema = new mongoose.Schema({
+    page:String,
+    totalsales:{
+        type:mongoose.Types.Decimal128
+        },
+    totalorders:Number,
+    totalproducts:Number,
+    totalcustomers:Number,
+    salesanalystics:{
+        monday:Number,
+        tuesday:Number,
+        wednesday:Number,
+        thursday:Number,
+        friday:Number,
+        saturday:Number,
+        sunday:Number,
+    },
+    latestOrders:{
+        OrderID:Array,
+        customer:Array,
+        Status:Array,
+        Total:Array
+    },
+    latestsearchItems:{
+        keyword:Array,
+        result:Array,
+        hits:Array
+    },
+    latestreviews:{
+        product:Array,
+        customer:Array,
+        ratings:Array
+    }
 });
 
+//creating collection
+const db = new mongoose.model('Davebrothertest',DashboardSchema);
+
+
+//sample Data
+const demo = {
+    page:"Dashboard",
+    totalsales:236365.54,
+    totalorders:1531,
+    totalproducts:125,
+    totalcustomers:485,
+    salesanalystics:{
+        monday:0,
+        tuesday:850,
+        wednesday:0,
+        thursday:0,
+        friday:0,
+        saturday:0,
+        sunday:0,
+    },
+    latestOrders:{
+        OrderID:[3764,3423,2342,3244,2344],
+        customer:["test data","test data","test data","test data","test data"],
+        Status:["pending","pending","pending","pending","pending",],
+        Total:[819,43,34,212,234]
+    },
+    latestsearchItems:{
+        keyword:["skirt1","skirt2","skirt3","skirt4","skirt5",],
+        result:[8,43,6,1,56],
+        hits:[1,676,34,45,344]
+    },
+    latestreviews:{
+        product:["shampoo"],
+        customer:["ujjwal"],
+        ratings:[4]
+    }
+};
+
+
+
+app.get("/",async (req,res)=>{
+    const data = new db(demo);
+
+    await data.save().then((r)=>{
+        res.json(
+            {
+                status:"success",
+                msg:"Recorded"
+            }
+        );
+    }).catch((err)=>{
+        res.json({
+            status:"Failure",
+            msgerr:err,
+            msg:"Not Been Recorded"
+        })
+    });
+});
+
+app.get("/Dashboard",(req,res)=>{
+    res.status(200).json(demo);
+});
 
 app.listen(3000 ,()=>{
     console.log("server started");
