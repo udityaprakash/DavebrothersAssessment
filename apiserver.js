@@ -104,7 +104,7 @@ const demo = {
 };
 
 
-
+//Saving the sample Data
 app.get("/",async (req,res)=>{
     const data = new db(demo);
 
@@ -124,10 +124,25 @@ app.get("/",async (req,res)=>{
     });
 });
 
-app.get("/Dashboard",(req,res)=>{
-    res.status(200).json(demo);
+//sending the data or sample data
+app.get("/Dashboard",async (req,res)=>{
+    let result;
+    try{
+        result = await db.findOne({page:"Dashboard"});
+        console.log(result);
+        res.status(200).json(result);
+
+    }catch{
+
+        res.json({
+            sample:demo,
+            msg:"false Data"
+        });
+    }
 });
 
+
+//setting up to listen on port
 app.listen(3000 ,()=>{
     console.log("server started");
 });
